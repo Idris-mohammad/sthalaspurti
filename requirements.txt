@@ -1,0 +1,9 @@
+pandas
+sqlite3
+os
+PIL
+uuid
+datetime
+base64
+flask
+
