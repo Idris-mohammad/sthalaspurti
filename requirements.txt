@@ -1,9 +1,5 @@
+streamlit
 pandas
-sqlite3
-os
-PIL
+folium
+streamlit-folium
 uuid
-datetime
-base64
-flask
-
