@@ -3,6 +3,4 @@ pandas
 folium
 streamlit-folium
 uuid
-streamlit-js-eval
 pillow
-
