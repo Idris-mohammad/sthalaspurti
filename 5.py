@@ -73,9 +73,9 @@ with tabs[0]:
     st.subheader("Location Details")
 
         # Try to get coordinates from browser
-        location = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_location")
+    location = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_location")
 
-        if location and "coords" in location:
+    if location and "coords" in location:
             st.session_state["latitude"] = location["coords"]["latitude"]
             st.session_state["longitude"] = location["coords"]["longitude"]
     with st.form("heritage_form"):
