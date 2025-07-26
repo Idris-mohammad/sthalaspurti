@@ -80,8 +80,8 @@ with tabs[0]:
             st.session_state["longitude"] = f"{lng:.5f}"
             st.session_state["geolocation"] = {'lat': lat, 'lng': lng}
             st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
-            else:
-                st.warning("Could not fetch location. Please allow browser location access.")
+        else:
+            st.warning("Could not fetch location. Please allow browser location access.")
 
     with st.form("heritage_form"):
         title = st.text_input("Heritage Site Title / వారసత్వ ప్రదేశం పేరు", max_chars=100)
