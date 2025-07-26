@@ -70,6 +70,14 @@ tabs = st.tabs(["📸 Upload", "🗺️ Map", "🏛️ Gallery"])
 # Upload Tab
 with tabs[0]:
     st.header("Upload Heritage Site")
+    st.subheader("Location Details")
+
+        # Try to get coordinates from browser
+        location = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_location")
+
+        if location and "coords" in location:
+            st.session_state["latitude"] = location["coords"]["latitude"]
+            st.session_state["longitude"] = location["coords"]["longitude"]
     with st.form("heritage_form"):
         title = st.text_input("Heritage Site Title / వారసత్వ ప్రదేశం పేరు", max_chars=100)
         photo = st.file_uploader("Photo / ఫోటో", type=['png', 'jpg', 'jpeg', 'gif'])
@@ -139,17 +147,6 @@ with tabs[0]:
         ])
         category = category.split(' / ')[0].lower()
         
-        
-
-        st.subheader("Location Details")
-
-        # Try to get coordinates from browser
-        location = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_location")
-
-        if location and "coords" in location:
-            st.session_state["latitude"] = location["coords"]["latitude"]
-            st.session_state["longitude"] = location["coords"]["longitude"]
-
         # Show latitude and longitude input fields (with prefilled values if available)
         latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
         longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
