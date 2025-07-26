@@ -70,7 +70,7 @@ tabs = st.tabs(["📸 Upload", "🗺️ Map", "🏛️ Gallery"])
 # Upload Tab
 with tabs[0]:
     st.header("Upload Heritage Site")
-   st.subheader("Location Details")
+    st.subheader("Location Details")
 
 # Only fetch location when button is clicked
     if st.button("📍 Get Location"):
