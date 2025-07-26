@@ -140,28 +140,26 @@ with tabs[0]:
         category = category.split(' / ')[0].lower()
         
         st.subheader("Location Details")
-        
-        # Initialize default values if not present
-        if "latitude" not in st.session_state:
-            st.session_state["latitude"] = ""
-        if "longitude" not in st.session_state:
-            st.session_state["longitude"] = ""
-        
-        # Trigger geolocation only when button is pressed
+
+        # Only fetch location when button is clicked
         if st.button("📍 Get Location"):
             location = streamlit_js_eval(
                 js_expressions="navigator.geolocation.getCurrentPosition",
-                key="get_location_button"
+                key="get_location"
             )
             if location and "coords" in location:
                 st.session_state["latitude"] = location["coords"]["latitude"]
                 st.session_state["longitude"] = location["coords"]["longitude"]
             else:
-                st.warning("Could not get location. Please allow location access in your browser.")
+                st.warning("Could not get location.")
         
-        # Input fields (prefilled if values are available)
-        latitude = st.text_input("Latitude", value=st.session_state["latitude"])
-        longitude = st.text_input("Longitude", value=st.session_state["longitude"])
+        # Now inside the form:
+        with st.form("heritage_form"):
+            ...
+            latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
+            longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
+            ...
+
 
         
         # Geolocation button
