@@ -139,20 +139,29 @@ with tabs[0]:
         ])
         category = category.split(' / ')[0].lower()
         
-        
-
         st.subheader("Location Details")
-
-        # Try to get coordinates from browser
-        location = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_location")
-
-        if location and "coords" in location:
-            st.session_state["latitude"] = location["coords"]["latitude"]
-            st.session_state["longitude"] = location["coords"]["longitude"]
-
-        # Show latitude and longitude input fields (with prefilled values if available)
-        latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
-        longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
+        
+        # Initialize default values if not present
+        if "latitude" not in st.session_state:
+            st.session_state["latitude"] = ""
+        if "longitude" not in st.session_state:
+            st.session_state["longitude"] = ""
+        
+        # Trigger geolocation only when button is pressed
+        if st.button("📍 Get Location"):
+            location = streamlit_js_eval(
+                js_expressions="navigator.geolocation.getCurrentPosition",
+                key="get_location_button"
+            )
+            if location and "coords" in location:
+                st.session_state["latitude"] = location["coords"]["latitude"]
+                st.session_state["longitude"] = location["coords"]["longitude"]
+            else:
+                st.warning("Could not get location. Please allow location access in your browser.")
+        
+        # Input fields (prefilled if values are available)
+        latitude = st.text_input("Latitude", value=st.session_state["latitude"])
+        longitude = st.text_input("Longitude", value=st.session_state["longitude"])
 
         
         # Geolocation button
