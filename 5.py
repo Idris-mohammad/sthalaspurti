@@ -138,7 +138,18 @@ with tabs[0]:
             "Well / బావి", "Statue / విగ్రహం", "Market / మార్కెట్", "Other / ఇతర"
         ])
         category = category.split(' / ')[0].lower()
-        
+        st.subheader("Get Your Location")
+        if st.button("Get location"):
+            location = streamlit_js_eval(js_expressions="getCurrentPosition", key="get_location")
+            if location and "coords" in location:
+                lat = location["coords"]["latitude"]
+                lng = location["coords"]["longitude"]
+                st.session_state["latitude"] = f"{lat:.5f}"
+                st.session_state["longitude"] = f"{lng:.5f}"
+                st.session_state["geolocation"] = {'lat': lat, 'lng': lng}
+                st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
+            else:
+                st.warning("Could not fetch location. Please allow browser location access.")
         # Show latitude and longitude input fields (with prefilled values if available)
         latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
         longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
@@ -200,19 +211,7 @@ with tabs[0]:
                     st.error(f"Database error: {e}")
                 except Exception as e:
                     st.error(f"Error: {e}")
-    st.subheader("Get Your Location")
-    if st.button("Get location"):
-        location = streamlit_js_eval(js_expressions="getCurrentPosition", key="get_location")
-        if location and "coords" in location:
-            lat = location["coords"]["latitude"]
-            lng = location["coords"]["longitude"]
-            st.session_state["latitude"] = f"{lat:.5f}"
-            st.session_state["longitude"] = f"{lng:.5f}"
-            st.session_state["geolocation"] = {'lat': lat, 'lng': lng}
-            st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
-        else:
-            st.warning("Could not fetch location. Please allow browser location access.")
-
+    
 # Map Tab
 with tabs[1]:
     st.header("Heritage Map / వారసత్వ మ్యాప్")
