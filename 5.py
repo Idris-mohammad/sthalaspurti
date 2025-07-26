@@ -4,7 +4,6 @@ import os
 import uuid
 from datetime import datetime
 from PIL import Image
-from streamlit_js_eval import streamlit_js_eval
 import io
 import base64
 import pandas as pd
@@ -138,22 +137,44 @@ with tabs[0]:
             "Well / బావి", "Statue / విగ్రహం", "Market / మార్కెట్", "Other / ఇతర"
         ])
         category = category.split(' / ')[0].lower()
-        st.subheader("Get Your Location")
-        if st.button("Get location"):
-            location = streamlit_js_eval(js_expressions="getCurrentPosition", key="get_location")
-            if location and "coords" in location:
-                lat = location["coords"]["latitude"]
-                lng = location["coords"]["longitude"]
-                st.session_state["latitude"] = f"{lat:.5f}"
-                st.session_state["longitude"] = f"{lng:.5f}"
-                st.session_state["geolocation"] = {'lat': lat, 'lng': lng}
-                st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
-            else:
-                st.warning("Could not fetch location. Please allow browser location access.")
-        # Show latitude and longitude input fields (with prefilled values if available)
-        latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
-        longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
-
+        
+        lat = st.text_input("Latitude", key="lat", disabled=True, placeholder="Click 'Get Location'")
+        lng = st.text_input("Longitude", key="lng", disabled=True)
+        
+        # Geolocation button
+        geolocation_html = """
+        <button id="getLocationBtn" class="btn">📍 Get Location</button>
+        <style>
+            .btn {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white; border: none; padding: 10px 20px;
+                border-radius: 10px; cursor: pointer;
+            }
+            .btn:hover { transform: translateY(-2px); }
+        </style>
+        <script>
+            document.getElementById('getLocationBtn').addEventListener('click', () => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            window.parent.postMessage({
+                                type: 'geolocation',
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            }, '*');
+                        },
+                        error => {
+                            alert('Unable to get location. Please try again.');
+                        }
+                    );
+                } else {
+                    alert('Geolocation is not supported by this browser.');
+                }
+            });
+        </script>
+        """
+        st.components.v1.html(geolocation_html, height=60)
+        
         # Handle geolocation data
         if 'geolocation' not in st.session_state:
             st.session_state.geolocation = {'lat': None, 'lng': None}
@@ -165,6 +186,19 @@ with tabs[0]:
                 st.session_state.geolocation['lng'] = data['lng']
                 st.session_state.lat = f"{data['lat']:.4f}"
                 st.session_state.lng = f"{data['lng']:.4f}"
+        
+        st.components.v1.html("""
+        <script>
+            window.addEventListener('message', (event) => {
+                if (event.data.type === 'geolocation') {
+                    window.parent.Streamlit.setComponentValue({
+                        lat: event.data.lat,
+                        lng: event.data.lng
+                    });
+                }
+            });
+        </script>
+        """, height=0)
         
         submitted = st.form_submit_button("✨ Share Heritage")
         if submitted:
@@ -211,7 +245,7 @@ with tabs[0]:
                     st.error(f"Database error: {e}")
                 except Exception as e:
                     st.error(f"Error: {e}")
-    
+
 # Map Tab
 with tabs[1]:
     st.header("Heritage Map / వారసత్వ మ్యాప్")
