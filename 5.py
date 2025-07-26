@@ -70,19 +70,23 @@ tabs = st.tabs(["📸 Upload", "🗺️ Map", "🏛️ Gallery"])
 # Upload Tab
 with tabs[0]:
     st.header("Upload Heritage Site")
-    st.subheader("Location Details")
-
-# Only fetch location when button is clicked
+    st.subheader("Get Your Location")
     if st.button("📍 Get Location"):
         location = streamlit_js_eval(
             js_expressions="navigator.geolocation.getCurrentPosition",
-            key="get_location"
+            key="get_location_btn"
         )
+    
         if location and "coords" in location:
-            st.session_state["latitude"] = location["coords"]["latitude"]
-            st.session_state["longitude"] = location["coords"]["longitude"]
+            lat = location["coords"]["latitude"]
+            lng = location["coords"]["longitude"]
+    
+            st.session_state["latitude"] = f"{lat:.5f}"
+            st.session_state["longitude"] = f"{lng:.5f}"
+            st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
         else:
-            st.warning("Could not get location.")
+            st.warning("Could not fetch location. Please allow browser location access.")
+
 
 
     with st.form("heritage_form"):
