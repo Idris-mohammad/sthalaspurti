@@ -71,23 +71,17 @@ tabs = st.tabs(["📸 Upload", "🗺️ Map", "🏛️ Gallery"])
 with tabs[0]:
     st.header("Upload Heritage Site")
     st.subheader("Get Your Location")
-    if st.button("📍 Get Location"):
-        location = streamlit_js_eval(
-            js_expressions="navigator.geolocation.getCurrentPosition",
-            key="get_location_btn"
-        )
-    
+    if st.button("Get location"):
+        location = streamlit_js_eval(js_expressions="getCurrentPosition", key="get_location")
         if location and "coords" in location:
             lat = location["coords"]["latitude"]
             lng = location["coords"]["longitude"]
-    
             st.session_state["latitude"] = f"{lat:.5f}"
             st.session_state["longitude"] = f"{lng:.5f}"
+            st.session_state["geolocation"] = {'lat': lat, 'lng': lng}
             st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
-        else:
-            st.warning("Could not fetch location. Please allow browser location access.")
-
-
+            else:
+                st.warning("Could not fetch location. Please allow browser location access.")
 
     with st.form("heritage_form"):
         title = st.text_input("Heritage Site Title / వారసత్వ ప్రదేశం పేరు", max_chars=100)
@@ -162,41 +156,6 @@ with tabs[0]:
         latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
         longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
 
-        
-        # Geolocation button
-        geolocation_html = """
-        <button id="getLocationBtn" class="btn">📍 Get Location</button>
-        <style>
-            .btn {
-                background: linear-gradient(135deg, #667eea, #764ba2);
-                color: white; border: none; padding: 10px 20px;
-                border-radius: 10px; cursor: pointer;
-            }
-            .btn:hover { transform: translateY(-2px); }
-        </style>
-        <script>
-            document.getElementById('getLocationBtn').addEventListener('click', () => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        position => {
-                            window.parent.postMessage({
-                                type: 'geolocation',
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude
-                            }, '*');
-                        },
-                        error => {
-                            alert('Unable to get location. Please try again.');
-                        }
-                    );
-                } else {
-                    alert('Geolocation is not supported by this browser.');
-                }
-            });
-        </script>
-        """
-        st.components.v1.html(geolocation_html, height=60)
-        
         # Handle geolocation data
         if 'geolocation' not in st.session_state:
             st.session_state.geolocation = {'lat': None, 'lng': None}
@@ -208,19 +167,6 @@ with tabs[0]:
                 st.session_state.geolocation['lng'] = data['lng']
                 st.session_state.lat = f"{data['lat']:.4f}"
                 st.session_state.lng = f"{data['lng']:.4f}"
-        
-        st.components.v1.html("""
-        <script>
-            window.addEventListener('message', (event) => {
-                if (event.data.type === 'geolocation') {
-                    window.parent.Streamlit.setComponentValue({
-                        lat: event.data.lat,
-                        lng: event.data.lng
-                    });
-                }
-            });
-        </script>
-        """, height=0)
         
         submitted = st.form_submit_button("✨ Share Heritage")
         if submitted:
