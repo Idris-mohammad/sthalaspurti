@@ -201,17 +201,17 @@ with tabs[0]:
                 except Exception as e:
                     st.error(f"Error: {e}")
     st.subheader("Get Your Location")
-        if st.button("Get location"):
-            location = streamlit_js_eval(js_expressions="getCurrentPosition", key="get_location")
-            if location and "coords" in location:
-                lat = location["coords"]["latitude"]
-                lng = location["coords"]["longitude"]
-                st.session_state["latitude"] = f"{lat:.5f}"
-                st.session_state["longitude"] = f"{lng:.5f}"
-                st.session_state["geolocation"] = {'lat': lat, 'lng': lng}
-                st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
-            else:
-                st.warning("Could not fetch location. Please allow browser location access.")
+    if st.button("Get location"):
+        location = streamlit_js_eval(js_expressions="getCurrentPosition", key="get_location")
+        if location and "coords" in location:
+            lat = location["coords"]["latitude"]
+            lng = location["coords"]["longitude"]
+            st.session_state["latitude"] = f"{lat:.5f}"
+            st.session_state["longitude"] = f"{lng:.5f}"
+            st.session_state["geolocation"] = {'lat': lat, 'lng': lng}
+            st.success(f"Location fetched: {lat:.5f}, {lng:.5f}")
+        else:
+            st.warning("Could not fetch location. Please allow browser location access.")
 
 # Map Tab
 with tabs[1]:
