@@ -70,14 +70,21 @@ tabs = st.tabs(["📸 Upload", "🗺️ Map", "🏛️ Gallery"])
 # Upload Tab
 with tabs[0]:
     st.header("Upload Heritage Site")
-    st.subheader("Location Details")
+   st.subheader("Location Details")
 
-        # Try to get coordinates from browser
-    location = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_location")
-
-    if location and "coords" in location:
+# Only fetch location when button is clicked
+    if st.button("📍 Get Location"):
+        location = streamlit_js_eval(
+            js_expressions="navigator.geolocation.getCurrentPosition",
+            key="get_location"
+        )
+        if location and "coords" in location:
             st.session_state["latitude"] = location["coords"]["latitude"]
             st.session_state["longitude"] = location["coords"]["longitude"]
+        else:
+            st.warning("Could not get location.")
+
+
     with st.form("heritage_form"):
         title = st.text_input("Heritage Site Title / వారసత్వ ప్రదేశం పేరు", max_chars=100)
         photo = st.file_uploader("Photo / ఫోటో", type=['png', 'jpg', 'jpeg', 'gif'])
