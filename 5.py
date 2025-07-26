@@ -4,6 +4,7 @@ import os
 import uuid
 from datetime import datetime
 from PIL import Image
+from streamlit_js_eval import streamlit_js_eval
 import io
 import base64
 import pandas as pd
@@ -15,22 +16,28 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webm'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Database setup
+# Initialize database
 def init_db():
-    try:
-        conn = sqlite3.connect('heritage.db')
-        c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS sites
-                     (id INTEGER PRIMARY KEY, title TEXT, description TEXT, 
-                      category TEXT, lat REAL, lng REAL, image TEXT, audio TEXT,
-                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-        c.execute('CREATE INDEX IF NOT EXISTS idx_created_at ON sites(created_at)')
-        conn.commit()
-    except sqlite3.Error as e:
-        st.error(f"Database error: {e}")
-    finally:
-        conn.close()
+    conn = sqlite3.connect('heritage.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS heritage_sites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            description TEXT,
+            category TEXT,
+            image_path TEXT,
+            audio_path TEXT,
+            latitude REAL,
+            longitude REAL,
+            timestamp TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 init_db()
+
 
 # Check allowed file extensions
 def allowed_file(filename):
@@ -132,8 +139,21 @@ with tabs[0]:
         ])
         category = category.split(' / ')[0].lower()
         
-        lat = st.text_input("Latitude", key="lat", disabled=True, placeholder="Click 'Get Location'")
-        lng = st.text_input("Longitude", key="lng", disabled=True)
+        
+
+        st.subheader("Location Details")
+
+        # Try to get coordinates from browser
+        location = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_location")
+
+        if location and "coords" in location:
+            st.session_state["latitude"] = location["coords"]["latitude"]
+            st.session_state["longitude"] = location["coords"]["longitude"]
+
+        # Show latitude and longitude input fields (with prefilled values if available)
+        latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
+        longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
+
         
         # Geolocation button
         geolocation_html = """
