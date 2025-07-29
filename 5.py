@@ -400,7 +400,8 @@ with tabs[2]:
             col1, col2 = st.columns([1, 2])
             with col1:
                 try:
-                    st.image(os.path.join(UPLOAD_FOLDER, site['image']), use_container_width=True)
+                    image_path = os.path.join("uploads", site['image'])  # NOT UPLOAD_FOLDER directly
+                    st.image(image_path, use_container_width=True)
                 except:
                     st.error("Image not found")
             with col2:
