@@ -7,7 +7,7 @@ from PIL import Image
 import io
 import base64
 import pandas as pd
-
+from streamlit_geolocation import streamlit_geolocation
 # Configuration
 UPLOAD_FOLDER = 'Uploads'
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
@@ -69,7 +69,19 @@ tabs = st.tabs(["📸 Upload", "🗺️ Map", "🏛️ Gallery"])
 # Upload Tab
 with tabs[0]:
     st.header("Upload Heritage Site")
-    from streamlit_javascript import st_javascript
+    st.subheader("📍 Get Current Location")
+    
+    # Call the component and get the result
+    loc_result = streamlit_geolocation()
+    
+    # Automatically populate lat/lng fields if available
+    if loc_result and loc_result.get("latitude") and loc_result.get("longitude"):
+        st.session_state["latitude"] = f'{loc_result["latitude"]:.6f}'
+        st.session_state["longitude"] = f'{loc_result["longitude"]:.6f}'
+        st.success(f"Location fetched: {st.session_state['latitude']}, {st.session_state['longitude']}")
+    else:
+        st.info("Click the button above and allow location access in your browser.")
+
     with st.form("heritage_form"):
         title = st.text_input("Heritage Site Title / వారసత్వ ప్రదేశం పేరు", max_chars=100)
         photo = st.file_uploader("Photo / ఫోటో", type=['png', 'jpg', 'jpeg', 'gif'])
@@ -139,8 +151,9 @@ with tabs[0]:
         ])
         category = category.split(' / ')[0].lower()
         
-        lat = st.text_input("Latitude", key="lat", disabled=True, placeholder="Click 'Get Location'")
-        lng = st.text_input("Longitude", key="lng", disabled=True)
+        latitude = st.text_input("Latitude", value=st.session_state.get("latitude", ""))
+        longitude = st.text_input("Longitude", value=st.session_state.get("longitude", ""))
+
         geolocation_html = """
         <button id="getLocationBtn" class="btn">📍 Get Location</button>
         <style>
