@@ -220,7 +220,7 @@ with tabs[0]:
                 st.error("Description must be between 1 and 1000 characters")
             elif not photo:
                 st.error("Please upload an image")
-            elif not st.session_state.geolocation['lat'] or not st.session_state.geolocation['lng']:
+            elif not st.session_state.get("latitude") or not st.session_state.get("longitude"):
                 st.error("Please get location")
             else:
                 try:
