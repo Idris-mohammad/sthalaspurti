@@ -70,24 +70,6 @@ tabs = st.tabs(["📸 Upload", "🗺️ Map", "🏛️ Gallery"])
 with tabs[0]:
     st.header("Upload Heritage Site")
     from streamlit_javascript import st_javascript
-    location_data = st_javascript("""navigator.geolocation.getCurrentPosition(
-        (loc) => {
-            const coords = loc.coords;
-            Streamlit.setComponentValue({
-                latitude: coords.latitude,
-                longitude: coords.longitude
-            });
-        },
-        (err) => {
-            alert("Could not get location: " + err.message);
-        }
-    );""")
-    
-    # Store to session_state so it can be used in the form
-    if location_data:
-        st.session_state.lat = f"{location_data['latitude']:.6f}"
-        st.session_state.lng = f"{location_data['longitude']:.6f}"
-
     with st.form("heritage_form"):
         title = st.text_input("Heritage Site Title / వారసత్వ ప్రదేశం పేరు", max_chars=100)
         photo = st.file_uploader("Photo / ఫోటో", type=['png', 'jpg', 'jpeg', 'gif'])
@@ -157,9 +139,8 @@ with tabs[0]:
         ])
         category = category.split(' / ')[0].lower()
         
-        lat = st.text_input("Latitude", value=st.session_state.get("lat", ""))
-        lng = st.text_input("Longitude", value=st.session_state.get("lng", ""))
-
+        lat = st.text_input("Latitude", key="lat", disabled=True, placeholder="Click 'Get Location'")
+        lng = st.text_input("Longitude", key="lng", disabled=True)
         geolocation_html = """
         <button id="getLocationBtn" class="btn">📍 Get Location</button>
         <style>
