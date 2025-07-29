@@ -5,3 +5,4 @@ streamlit-folium
 uuid
 pillow
 streamlit-js-eval
+streamlit-javascript
